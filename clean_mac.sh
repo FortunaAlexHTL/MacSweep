@@ -2,9 +2,13 @@
 # ==============================================================================
 # Script Name:  clean_mac.sh
 # Description:  Cloud-Safe macOS Storage Analyzer & Optimization Utility
-# Version:      1.0.0
+# Version:      1.1.0
 # License:      MIT License
+# Author:       Fortuna Alexandru
 # ==============================================================================
+
+printf "\e[8;40;120t"
+clear
 
 # Color matrix for standardized log levels
 RED='\033[0;31m'
@@ -13,7 +17,7 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # --- SYSTEM TITLE ---
 echo -e "${CYAN}======================================================================${NC}"
@@ -22,7 +26,12 @@ echo -e "${CYAN} This is a free and open-source utility (MIT License)${NC}"
 echo -e "${CYAN}======================================================================${NC}"
 
 # --- GLOBAL SAFETY DISCLOSURE (NOW AT THE TOP) ---
-echo -e "\n${YELLOW}[SECURITY]${NC}"
+echo -e "\n${RED}[WARNING]${NC}"
+echo -e "${RED}----------------------------------------------------------------------${NC}"
+echo -e "${RED}  Please close any opened applications before proceeding!${NC}"
+echo -e "${RED}----------------------------------------------------------------------${NC}\n"
+
+echo -e "${YELLOW}[SECURITY]${NC}"
 echo -e "${YELLOW}----------------------------------------------------------------------${NC}"
 echo -e "  ${GREEN}[✓] IGNORING Microsoft OneDrive:${NC}   $HOME/OneDrive/*"
 echo -e "  ${GREEN}[✓] IGNORING Apple iCloud Drive:${NC}  $HOME/Library/Mobile Documents/*"
@@ -41,22 +50,11 @@ echo ""
 # --- GLOBAL INITIALIZATION GATE ---
 read -p "Initialize Mac Sweep toolkit? (y/n): " init_choice
 if [[ "$init_choice" != "y" && "$init_choice" != "Y" ]]; then
-    echo -e "${YELLOW}[INFO]${NC} Session aborted by user. Exiting safely."
+    echo -e "\n${YELLOW}[INFO]${NC} Session aborted by user. Exiting safely."
     exit 0
 fi
 
-# --- PHASE 1: AUTOMATED APPLICATION CACHE PURGE ---
-echo -e "\n${CYAN}[INFO]${NC} Initializing pre-scan optimization routines..."
-read -p "Execute automated application cache purge? (y/n): " quick_choice
-if [[ "$quick_choice" == "y" || "$quick_choice" == "Y" ]]; then
-    echo -e "${YELLOW}[PROGRESS]${NC} Purging target application caches..."
-    [ -d ~/Library/Caches/com.spotify.client ] && rm -rf ~/Library/Caches/com.spotify.client/*
-    [ -d ~/Library/Containers/com.microsoft.teams2 ] && rm -rf ~/Library/Containers/com.microsoft.teams2/Data/Library/Caches/*
-    [ -d ~/Library/Application\ Support/Code/User/workspaceStorage ] && rm -rf ~/Library/Application\ Support/Code/User/workspaceStorage/*
-    command -v dotnet &> /dev/null && dotnet nuget locals all --clear > /dev/null
-    rm -rf ~/Library/Logs/*
-    echo -e "${GREEN}[SUCCESS]${NC} Cache purge completed successfully."
-fi
+clear
 
 # --- PHASE 2: CLOUD-SAFE ISOLATED FILE SCAN LOOP ---
 while true; do
@@ -86,12 +84,12 @@ while true; do
     select opt in "${options[@]}"; do
         
         if [[ "$REPLY" == "X" || "$REPLY" == "x" ]]; then
-            echo -e "${GREEN}[INFO]${NC} Terminating Storage Manager utility session."
+            echo -e "\n${GREEN}[INFO]${NC} Terminating Storage Manager utility session."
             break 2
         fi
 
         if [ -z "$opt" ]; then
-            echo -e "${RED}[ERROR] Invalid input. Please enter a number from the list or 'X' to exit.${NC}"
+            echo -e "\n${RED}[ERROR] Invalid input. Please enter a number from the list or 'X' to exit.${NC}"
             continue
         fi
 
@@ -102,14 +100,18 @@ while true; do
         echo -e "${YELLOW}File Name:${NC}   $(basename "$chosen_file")"
         echo -e "${YELLOW}File Size:${NC}   $(du -sh "$chosen_file" | cut -f1)"
         echo -e "${YELLOW}System Path:${NC}  $chosen_file"
-        echo -e "${RED}===========================================================${NC}"
+        echo -e "${RED}===========================================================${NC}\n"
         
         read -p "Confirm permanent deletion of target file? (y/n): " confirm
         if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
             rm -f "$chosen_file"
             echo -e "${GREEN}[SUCCESS] Target object purged from storage.${NC}"
+            read -t 3
+            clear
         else
             echo -e "${YELLOW}[INFO] Target object bypassed.${NC}"
+            read -t 3
+            clear
         fi
         break 
     done
